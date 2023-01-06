@@ -110,7 +110,6 @@ func getListOfCoffeeTableIds(botToken string, serverId string) []string {
 
 	var co []ChannelOrCategory
 
-	// resp.Body to string
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(response.Body)
 
