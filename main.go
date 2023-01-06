@@ -13,6 +13,7 @@ func main() {
 	serverId := os.Getenv("SERVER_ID")
 
 	getChannelDetails(botToken, serverId)
+	fmt.Println("")
 	createCoffeeTable(botToken, serverId)
 }
 
