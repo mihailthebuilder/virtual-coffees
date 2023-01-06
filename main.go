@@ -35,7 +35,7 @@ func main() {
 	}
 
 	// api.createCoffeeTables(5)
-	api.deleteCoffeeTables(6)
+	api.deleteCoffeeTables(4)
 }
 
 func (d *DiscordApi) createCoffeeTables(numberOfTables int) {
@@ -45,30 +45,45 @@ func (d *DiscordApi) createCoffeeTables(numberOfTables int) {
 
 		url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", d.serverId)
 
-		response := d.sendRequest("POST", url, body)
-		fmt.Println(string(response))
+		statusCode, responseBody := d.sendRequest("POST", url, body)
+		if statusCode != http.StatusCreated {
+			panic("Error creating channel: " + string(responseBody))
+		}
+
+		fmt.Println(string(responseBody))
 	}
 }
 
 func (d *DiscordApi) deleteCoffeeTables(numberOfTables int) {
 	tableIds := d.getListOfCoffeeTableIds()
 
+	if len(tableIds) < numberOfTables {
+		panic("Not enough tables to delete")
+	}
+
 	for i := 0; i < numberOfTables; i++ {
 		url := fmt.Sprintf("https://discord.com/api/channels/%s", tableIds[i])
 
-		response := d.sendRequest("DELETE", url, nil)
-		fmt.Println(string(response))
+		statusCode, responseBody := d.sendRequest("DELETE", url, nil)
+		if statusCode != http.StatusOK {
+			panic("Error deleting channel with id: " + tableIds[i] + "error: " + string(responseBody))
+		}
+
+		fmt.Println(string(responseBody))
 	}
 }
 
 func (d *DiscordApi) getListOfCoffeeTableIds() []string {
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", d.serverId)
 
-	response := d.sendRequest("GET", url, nil)
+	statusCode, responseBody := d.sendRequest("GET", url, nil)
+	if statusCode != http.StatusOK {
+		panic("Error getting channels: " + string(responseBody))
+	}
 
 	var co []ChannelOrCategory
 
-	err := json.Unmarshal(response, &co)
+	err := json.Unmarshal(responseBody, &co)
 
 	if err != nil {
 		panic(err)
@@ -85,7 +100,7 @@ func (d *DiscordApi) getListOfCoffeeTableIds() []string {
 	return out
 }
 
-func (d *DiscordApi) sendRequest(method string, url string, requestBody []byte) []byte {
+func (d *DiscordApi) sendRequest(method string, url string, requestBody []byte) (int, []byte) {
 	client := &http.Client{}
 
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
@@ -108,9 +123,5 @@ func (d *DiscordApi) sendRequest(method string, url string, requestBody []byte) 
 		panic(err)
 	}
 
-	if !(response.StatusCode == http.StatusOK || response.StatusCode == http.StatusCreated) {
-		panic(fmt.Sprintf("Status: %d, body: %b", response.StatusCode, responseBody))
-	}
-
-	return responseBody
+	return response.StatusCode, responseBody
 }
