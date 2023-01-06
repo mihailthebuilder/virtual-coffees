@@ -97,7 +97,7 @@ type ChannelOrCategory struct {
 func (d *DiscordApi) getListOfCoffeeTableIds() []string {
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", d.serverId)
 
-	response := d.sendRequest(url, "GET", nil)
+	response := d.sendRequest("GET", url, nil)
 
 	var co []ChannelOrCategory
 
@@ -118,7 +118,7 @@ func (d *DiscordApi) getListOfCoffeeTableIds() []string {
 	return out
 }
 
-func (d *DiscordApi) sendRequest(url string, method string, requestBody []byte) []byte {
+func (d *DiscordApi) sendRequest(method string, url string, requestBody []byte) []byte {
 	client := &http.Client{}
 
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
