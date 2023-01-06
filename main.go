@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -34,8 +35,18 @@ func main() {
 		serverId: os.Getenv("SERVER_ID"),
 	}
 
-	// api.createCoffeeTables(5)
-	api.deleteCoffeeTables(4)
+	method := flag.String("method", "", "create or delete")
+	numberOfTables := flag.Int("number", 1, "number of tables to create or delete")
+
+	flag.Parse()
+
+	if *method == "create" {
+		api.createCoffeeTables(*numberOfTables)
+	} else if *method == "delete" {
+		api.deleteCoffeeTables(*numberOfTables)
+	} else {
+		panic("Invalid method")
+	}
 }
 
 func (d *DiscordApi) createCoffeeTables(numberOfTables int) {
