@@ -10,11 +10,18 @@ import (
 )
 
 func main() {
-	botToken := os.Getenv("BOT_TOKEN")
-	serverId := os.Getenv("SERVER_ID")
+	api := DiscordApi{
+		botToken: os.Getenv("BOT_TOKEN"),
+		serverId: os.Getenv("SERVER_ID"),
+	}
 
 	// createCoffeeTables(botToken, serverId, 5)
-	deleteCoffeeTables(botToken, serverId, 5)
+	api.deleteCoffeeTables(1)
+}
+
+type DiscordApi struct {
+	botToken string
+	serverId string
 }
 
 func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
@@ -50,8 +57,8 @@ func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
 	}
 }
 
-func deleteCoffeeTables(botToken string, serverId string, numberOfTables int) {
-	tableIds := getListOfCoffeeTableIds(botToken, serverId)
+func (d *DiscordApi) deleteCoffeeTables(numberOfTables int) {
+	tableIds := d.getListOfCoffeeTableIds(d.botToken, d.serverId)
 
 	for i := 0; i < numberOfTables; i++ {
 		url := fmt.Sprintf("https://discord.com/api/channels/%s", tableIds[i])
@@ -64,7 +71,7 @@ func deleteCoffeeTables(botToken string, serverId string, numberOfTables int) {
 			os.Exit(1)
 		}
 
-		req.Header.Set("Authorization", fmt.Sprintf("Bot %s", botToken))
+		req.Header.Set("Authorization", fmt.Sprintf("Bot %s", d.botToken))
 		req.Header.Set("Content-Type", "application/json")
 
 		resp, err := client.Do(req)
@@ -87,7 +94,7 @@ type ChannelOrCategory struct {
 	ParentId string `json:"parent_id"`
 }
 
-func getListOfCoffeeTableIds(botToken string, serverId string) []string {
+func (d *DiscordApi) getListOfCoffeeTableIds(botToken string, serverId string) []string {
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
 
 	client := &http.Client{}
