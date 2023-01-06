@@ -12,6 +12,11 @@ func main() {
 	botToken := os.Getenv("BOT_TOKEN")
 	serverId := os.Getenv("SERVER_ID")
 
+	getChannelDetails(botToken, serverId)
+	createCoffeeTable(botToken, serverId)
+}
+
+func createCoffeeTable(botToken string, serverId string) {
 	body := []byte(`{"name":"coffee-table","type":2,"user_limit":2}`)
 
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
@@ -39,12 +44,10 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	getChannelDetails(botToken, serverId)
 }
 
 func getChannelDetails(botToken string, serverId string) {
-	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels/1035886233135620128", serverId)
+	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", url, nil)
