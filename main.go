@@ -12,7 +12,8 @@ func main() {
 	botToken := os.Getenv("BOT_TOKEN")
 	serverId := os.Getenv("SERVER_ID")
 
-	createCoffeeTables(botToken, serverId, 5)
+	// createCoffeeTables(botToken, serverId, 5)
+	deleteCoffeeTables(botToken, serverId, 5)
 }
 
 func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
@@ -46,4 +47,38 @@ func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
 			os.Exit(1)
 		}
 	}
+}
+
+func deleteCoffeeTables(botToken string, serverId string, numberOfTables int) {
+	tableIds := getListOfCoffeeTableIds(botToken, serverId)
+	fmt.Println(tableIds)
+}
+
+func getListOfCoffeeTableIds(botToken string, serverId string) []string {
+	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
+
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bot %s", botToken))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+
+	_, err = io.Copy(os.Stdout, resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	return []string{"1", "2", "3"}
 }
