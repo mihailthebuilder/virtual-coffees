@@ -52,7 +52,34 @@ func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
 
 func deleteCoffeeTables(botToken string, serverId string, numberOfTables int) {
 	tableIds := getListOfCoffeeTableIds(botToken, serverId)
-	fmt.Println(tableIds)
+
+	for i := 0; i < numberOfTables; i++ {
+		url := fmt.Sprintf("https://discord.com/api/channels/%s", tableIds[i])
+
+		client := &http.Client{}
+
+		req, err := http.NewRequest("DELETE", url, nil)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		req.Header.Set("Authorization", fmt.Sprintf("Bot %s", botToken))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		defer resp.Body.Close()
+
+		_, err = io.Copy(os.Stdout, resp.Body)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
 }
 
 type ChannelOrCategory struct {
