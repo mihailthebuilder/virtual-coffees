@@ -27,40 +27,19 @@ func main() {
 		serverId: os.Getenv("SERVER_ID"),
 	}
 
-	// createCoffeeTables(botToken, serverId, 5)
-	api.deleteCoffeeTables(1)
+	// api.createCoffeeTables(5)
+	api.deleteCoffeeTables(6)
 }
 
-func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
+func (d *DiscordApi) createCoffeeTables(numberOfTables int) {
 
 	for i := 0; i < numberOfTables; i++ {
 		body := []byte(fmt.Sprintf(`{"name":"coffee-table","type":2,"user_limit":2,"parent_id":"%s"}`, TablesCategoryId))
 
-		url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
+		url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", d.serverId)
 
-		client := &http.Client{}
-
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		req.Header.Set("Authorization", fmt.Sprintf("Bot %s", botToken))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := client.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		defer resp.Body.Close()
-
-		_, err = io.Copy(os.Stdout, resp.Body)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		response := d.sendRequest("POST", url, body)
+		fmt.Println(string(response))
 	}
 }
 
@@ -122,7 +101,7 @@ func (d *DiscordApi) sendRequest(method string, url string, requestBody []byte) 
 		panic(err)
 	}
 
-	if response.StatusCode != http.StatusOK {
+	if !(response.StatusCode == http.StatusOK || response.StatusCode == http.StatusCreated) {
 		panic(fmt.Sprintf("Status: %d, body: %b", response.StatusCode, responseBody))
 	}
 
