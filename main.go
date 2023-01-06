@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,23 +9,23 @@ import (
 )
 
 func main() {
-	// Replace YOUR_TOKEN_HERE with your Discord bot token
-	token := os.Getenv("BOT_TOKEN")
-	// Replace SERVER_ID_HERE with the ID of the server you want to retrieve channels from
-	serverID := os.Getenv("SERVER_ID")
+	botToken := os.Getenv("BOT_TOKEN")
+	serverId := os.Getenv("SERVER_ID")
 
-	fmt.Println(token, serverID)
-	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverID)
+	body := []byte(`{"name":"new-channel-1","type":0}`)
+
+	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
 
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bot %s", token))
+	req.Header.Set("Authorization", fmt.Sprintf("Bot %s", botToken))
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -33,7 +34,6 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	// Use io.Copy to copy the response body to stdout
 	_, err = io.Copy(os.Stdout, resp.Body)
 	if err != nil {
 		fmt.Println(err)
