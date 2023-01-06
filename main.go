@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -54,31 +55,47 @@ func deleteCoffeeTables(botToken string, serverId string, numberOfTables int) {
 	fmt.Println(tableIds)
 }
 
+type ChannelOrCategory struct {
+	Id       string `json:"id"`
+	ParentId string `json:"parent_id"`
+}
+
 func getListOfCoffeeTableIds(botToken string, serverId string) []string {
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
 
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", url, nil)
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bot %s", botToken))
-	req.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", fmt.Sprintf("Bot %s", botToken))
+	request.Header.Set("Content-Type", "application/json")
 
-	resp, err := client.Do(req)
+	response, err := client.Do(request)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	defer resp.Body.Close()
+	defer response.Body.Close()
 
-	_, err = io.Copy(os.Stdout, resp.Body)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	var co []ChannelOrCategory
+
+	// resp.Body to string
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(response.Body)
+
+	json.Unmarshal(buf.Bytes(), &co)
+
+	var out []string
+
+	for _, v := range co {
+		if v.ParentId == "1035886233135620127" {
+			out = append(out, v.Id)
+		}
 	}
-	return []string{"1", "2", "3"}
+
+	return out
 }
