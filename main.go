@@ -19,6 +19,8 @@ type ChannelOrCategory struct {
 	ParentId string `json:"parent_id"`
 }
 
+const TablesCategoryId = "1035886233135620127"
+
 func main() {
 	api := DiscordApi{
 		botToken: os.Getenv("BOT_TOKEN"),
@@ -32,7 +34,7 @@ func main() {
 func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
 
 	for i := 0; i < numberOfTables; i++ {
-		body := []byte(`{"name":"coffee-table","type":2,"user_limit":2,"parent_id":"1035886233135620127"}`)
+		body := []byte(fmt.Sprintf(`{"name":"coffee-table","type":2,"user_limit":2,"parent_id":"%s"}`, TablesCategoryId))
 
 		url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
 
@@ -89,7 +91,7 @@ func (d *DiscordApi) getListOfCoffeeTableIds() []string {
 	var out []string
 
 	for _, v := range co {
-		if v.ParentId == "1035886233135620127" {
+		if v.ParentId == TablesCategoryId {
 			out = append(out, v.Id)
 		}
 	}
