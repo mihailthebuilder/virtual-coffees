@@ -18,7 +18,7 @@ func main() {
 }
 
 func createCoffeeTable(botToken string, serverId string) {
-	body := []byte(`{"name":"coffee-table","type":2,"user_limit":2}`)
+	body := []byte(`{"name":"coffee-table","type":2,"user_limit":2,"parent_id":"1035886233135620127"}`)
 
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
 
