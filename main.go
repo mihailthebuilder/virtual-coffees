@@ -9,6 +9,16 @@ import (
 	"os"
 )
 
+type DiscordApi struct {
+	botToken string
+	serverId string
+}
+
+type ChannelOrCategory struct {
+	Id       string `json:"id"`
+	ParentId string `json:"parent_id"`
+}
+
 func main() {
 	api := DiscordApi{
 		botToken: os.Getenv("BOT_TOKEN"),
@@ -17,11 +27,6 @@ func main() {
 
 	// createCoffeeTables(botToken, serverId, 5)
 	api.deleteCoffeeTables(1)
-}
-
-type DiscordApi struct {
-	botToken string
-	serverId string
 }
 
 func createCoffeeTables(botToken string, serverId string, numberOfTables int) {
@@ -63,35 +68,9 @@ func (d *DiscordApi) deleteCoffeeTables(numberOfTables int) {
 	for i := 0; i < numberOfTables; i++ {
 		url := fmt.Sprintf("https://discord.com/api/channels/%s", tableIds[i])
 
-		client := &http.Client{}
-
-		req, err := http.NewRequest("DELETE", url, nil)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		req.Header.Set("Authorization", fmt.Sprintf("Bot %s", d.botToken))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := client.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		defer resp.Body.Close()
-
-		_, err = io.Copy(os.Stdout, resp.Body)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		response := d.sendRequest("DELETE", url, nil)
+		fmt.Println(string(response))
 	}
-}
-
-type ChannelOrCategory struct {
-	Id       string `json:"id"`
-	ParentId string `json:"parent_id"`
 }
 
 func (d *DiscordApi) getListOfCoffeeTableIds() []string {
