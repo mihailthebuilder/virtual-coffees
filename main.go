@@ -145,5 +145,5 @@ func (d *DiscordApi) sendRequest(url string, method string, requestBody []byte) 
 		panic(fmt.Sprintf("Status: %d, body: %b", response.StatusCode, responseBody))
 	}
 
-	return requestBody
+	return responseBody
 }
