@@ -12,7 +12,7 @@ func main() {
 	botToken := os.Getenv("BOT_TOKEN")
 	serverId := os.Getenv("SERVER_ID")
 
-	body := []byte(`{"name":"new-channel-1","type":0}`)
+	body := []byte(`{"name":"coffee-table","type":2,"user_limit":2}`)
 
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", serverId)
 
