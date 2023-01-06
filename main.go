@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type DiscordApi struct {
@@ -22,6 +24,11 @@ type ChannelOrCategory struct {
 const TablesCategoryId = "1035886233135620127"
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
 	api := DiscordApi{
 		botToken: os.Getenv("BOT_TOKEN"),
 		serverId: os.Getenv("SERVER_ID"),
