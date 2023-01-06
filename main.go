@@ -97,30 +97,15 @@ type ChannelOrCategory struct {
 func (d *DiscordApi) getListOfCoffeeTableIds() []string {
 	url := fmt.Sprintf("https://discord.com/api/guilds/%s/channels", d.serverId)
 
-	client := &http.Client{}
-
-	request, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	request.Header.Set("Authorization", fmt.Sprintf("Bot %s", d.botToken))
-	request.Header.Set("Content-Type", "application/json")
-
-	response, err := client.Do(request)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	defer response.Body.Close()
+	response := d.sendRequest(url, "GET", nil)
 
 	var co []ChannelOrCategory
 
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(response.Body)
+	err := json.Unmarshal(response, &co)
 
-	json.Unmarshal(buf.Bytes(), &co)
+	if err != nil {
+		panic(err)
+	}
 
 	var out []string
 
@@ -131,4 +116,34 @@ func (d *DiscordApi) getListOfCoffeeTableIds() []string {
 	}
 
 	return out
+}
+
+func (d *DiscordApi) sendRequest(url string, method string, requestBody []byte) []byte {
+	client := &http.Client{}
+
+	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	request.Header.Set("Authorization", fmt.Sprintf("Bot %s", d.botToken))
+	request.Header.Set("Content-Type", "application/json")
+
+	response, err := client.Do(request)
+	if err != nil {
+		panic(err)
+	}
+	defer response.Body.Close()
+
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	if response.StatusCode != http.StatusOK {
+		panic(fmt.Sprintf("Status: %d, body: %b", response.StatusCode, responseBody))
+	}
+
+	return requestBody
 }
