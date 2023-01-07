@@ -72,7 +72,7 @@ func (d *DiscordApi) deleteCoffeeTables(numberOfTables int) {
 		panic("Not enough tables to delete")
 	}
 
-	for i := numberOfTables; i > 0; i-- {
+	for i := numberOfTables - 1; i >= 0; i-- {
 		url := fmt.Sprintf("https://discord.com/api/channels/%s", tableIds[i])
 
 		statusCode, responseBody := d.sendRequest("DELETE", url, nil)
