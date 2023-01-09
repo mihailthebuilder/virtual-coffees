@@ -116,8 +116,7 @@ func (d *DiscordApi) sendRequest(method string, url string, requestBody []byte) 
 
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(requestBody))
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		panic(err)
 	}
 
 	request.Header.Set("Authorization", fmt.Sprintf("Bot %s", d.botToken))
