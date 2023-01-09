@@ -1,6 +1,6 @@
 # Discord Virtual Coffees
 
-CLI tool written in Go that bulk creates/deletes voice channels on a Discord server. Very bare bones and tailored to my use case.
+CLI tool written in Go that bulk creates/deletes voice channels on a Discord server. Each voice channel can have 2 users max, so it operates like a virtual coffee table.  Very bare bones and tailored to my use case.
 
 To create 5 voice channels:
 
